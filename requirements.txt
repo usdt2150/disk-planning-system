@@ -11,7 +11,7 @@ itsdangerous==2.1.2
 
 # 系統監控和HTTP請求
 psutil==5.9.6
-requests==2.31.0
+requests==2.32.4
 
 # 配置管理
 PyYAML==6.0.1
