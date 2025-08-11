@@ -1,0 +1,270 @@
+{
+  "dashboard": {
+    "name": "磁區規劃分析儀表板",
+    "description": "磁碟使用情況和項目統計的綜合分析儀表板",
+    "version": "1.0",
+    "created_by": "磁區規劃管理系統",
+    "tags": ["磁碟分析", "項目統計", "系統監控"]
+  },
+  "datasources": [
+    {
+      "id": "disk_usage_ds",
+      "name": "磁碟使用情況",
+      "type": "csv",
+      "file_path": "disk_usage_data.csv",
+      "description": "各磁碟的使用空間和可用空間數據"
+    },
+    {
+      "id": "project_stats_ds",
+      "name": "項目統計",
+      "type": "csv",
+      "file_path": "project_statistics_data.csv",
+      "description": "項目類型、大小和分布統計數據"
+    }
+  ],
+  "charts": [
+    {
+      "id": "disk_usage_pie",
+      "name": "磁碟使用空間分布",
+      "type": "pie",
+      "datasource": "disk_usage_ds",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "width": 6,
+        "height": 4
+      },
+      "config": {
+        "dimension": "drive",
+        "measure": "used_space_gb",
+        "title": "各磁碟使用空間分布",
+        "show_legend": true,
+        "show_labels": true,
+        "color_scheme": "default"
+      }
+    },
+    {
+      "id": "disk_usage_bar",
+      "name": "磁碟使用率對比",
+      "type": "bar",
+      "datasource": "disk_usage_ds",
+      "position": {
+        "x": 6,
+        "y": 0,
+        "width": 6,
+        "height": 4
+      },
+      "config": {
+        "dimension": "drive",
+        "measure": "usage_percentage",
+        "title": "磁碟使用率對比",
+        "x_axis_title": "磁碟",
+        "y_axis_title": "使用率 (%)",
+        "show_values": true,
+        "color_scheme": "gradient"
+      }
+    },
+    {
+      "id": "available_space_gauge",
+      "name": "可用空間指標",
+      "type": "gauge",
+      "datasource": "disk_usage_ds",
+      "position": {
+        "x": 0,
+        "y": 4,
+        "width": 4,
+        "height": 3
+      },
+      "config": {
+        "measure": "available_space_gb",
+        "title": "總可用空間 (GB)",
+        "min_value": 0,
+        "max_value": 1000,
+        "target_value": 500,
+        "color_ranges": [
+          {"min": 0, "max": 100, "color": "#ff4444"},
+          {"min": 100, "max": 300, "color": "#ffaa00"},
+          {"min": 300, "max": 1000, "color": "#00aa00"}
+        ]
+      }
+    },
+    {
+      "id": "project_type_donut",
+      "name": "項目類型分布",
+      "type": "donut",
+      "datasource": "project_stats_ds",
+      "position": {
+        "x": 4,
+        "y": 4,
+        "width": 4,
+        "height": 3
+      },
+      "config": {
+        "dimension": "project_type",
+        "measure": "count",
+        "title": "項目類型分布",
+        "show_legend": true,
+        "inner_radius": 0.4,
+        "color_scheme": "category"
+      }
+    },
+    {
+      "id": "project_size_horizontal_bar",
+      "name": "項目大小對比",
+      "type": "horizontal_bar",
+      "datasource": "project_stats_ds",
+      "position": {
+        "x": 8,
+        "y": 4,
+        "width": 4,
+        "height": 3
+      },
+      "config": {
+        "dimension": "project_name",
+        "measure": "size_mb",
+        "title": "項目大小對比 (MB)",
+        "x_axis_title": "大小 (MB)",
+        "y_axis_title": "項目",
+        "show_values": true,
+        "sort_order": "desc",
+        "max_items": 10
+      }
+    },
+    {
+      "id": "disk_trend_line",
+      "name": "磁碟使用趨勢",
+      "type": "line",
+      "datasource": "disk_usage_ds",
+      "position": {
+        "x": 0,
+        "y": 7,
+        "width": 8,
+        "height": 4
+      },
+      "config": {
+        "dimension": "timestamp",
+        "measure": "used_space_gb",
+        "series": "drive",
+        "title": "磁碟使用量變化趨勢",
+        "x_axis_title": "時間",
+        "y_axis_title": "使用量 (GB)",
+        "show_points": true,
+        "smooth_line": true,
+        "show_legend": true
+      }
+    },
+    {
+      "id": "summary_table",
+      "name": "項目詳細信息",
+      "type": "table",
+      "datasource": "project_stats_ds",
+      "position": {
+        "x": 8,
+        "y": 7,
+        "width": 4,
+        "height": 4
+      },
+      "config": {
+        "columns": [
+          {"field": "project_name", "title": "項目名稱", "width": 120},
+          {"field": "project_type", "title": "類型", "width": 80},
+          {"field": "size_mb", "title": "大小(MB)", "width": 80, "format": "number"},
+          {"field": "last_modified", "title": "最後修改", "width": 100, "format": "date"}
+        ],
+        "title": "項目詳細信息",
+        "show_header": true,
+        "show_pagination": true,
+        "page_size": 10,
+        "sortable": true
+      }
+    }
+  ],
+  "filters": [
+    {
+      "id": "drive_filter",
+      "name": "磁碟篩選",
+      "type": "select",
+      "datasource": "disk_usage_ds",
+      "field": "drive",
+      "position": {
+        "x": 0,
+        "y": 11,
+        "width": 3,
+        "height": 1
+      },
+      "config": {
+        "title": "選擇磁碟",
+        "multiple": true,
+        "default_all": true
+      }
+    },
+    {
+      "id": "project_type_filter",
+      "name": "項目類型篩選",
+      "type": "select",
+      "datasource": "project_stats_ds",
+      "field": "project_type",
+      "position": {
+        "x": 3,
+        "y": 11,
+        "width": 3,
+        "height": 1
+      },
+      "config": {
+        "title": "選擇項目類型",
+        "multiple": true,
+        "default_all": true
+      }
+    },
+    {
+      "id": "date_range_filter",
+      "name": "時間範圍篩選",
+      "type": "date_range",
+      "datasource": "disk_usage_ds",
+      "field": "timestamp",
+      "position": {
+        "x": 6,
+        "y": 11,
+        "width": 4,
+        "height": 1
+      },
+      "config": {
+        "title": "選擇時間範圍",
+        "default_range": "last_30_days"
+      }
+    }
+  ],
+  "layout": {
+    "grid_size": 12,
+    "row_height": 60,
+    "margin": 10,
+    "background_color": "#f8f9fa",
+    "title_color": "#343a40"
+  },
+  "refresh": {
+    "auto_refresh": true,
+    "interval": 300,
+    "unit": "seconds"
+  },
+  "export": {
+    "formats": ["pdf", "png", "excel"],
+    "schedule": {
+      "enabled": false,
+      "frequency": "daily",
+      "time": "09:00",
+      "recipients": []
+    }
+  },
+  "permissions": {
+    "view": ["admin", "user"],
+    "edit": ["admin"],
+    "share": ["admin"]
+  },
+  "metadata": {
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z",
+    "version": "1.0.0",
+    "author": "磁區規劃管理系統",
+    "description": "這是一個專為磁區規劃分析設計的 DataEase 儀表板模板，包含磁碟使用情況分析、項目統計分析等多個維度的數據可視化組件。"
+  }
+}

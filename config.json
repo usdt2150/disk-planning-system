@@ -1,0 +1,36 @@
+{
+  "dataease": {
+    "host": "localhost",
+    "port": 8081,
+    "timeout": 10,
+    "username": "admin",
+    "password": "DataEase@123456"
+  },
+  "api": {
+    "host": "0.0.0.0",
+    "port": 5000,
+    "debug": false
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "api.log",
+    "max_size": "10MB",
+    "backup_count": 5
+  },
+  "database": {
+    "sqlite_path": "disk_planning_data.db",
+    "backup_enabled": true,
+    "backup_interval_hours": 24
+  },
+  "security": {
+    "cors_enabled": true,
+    "rate_limiting": {
+      "enabled": false,
+      "requests_per_minute": 60
+    }
+  },
+  "monitoring": {
+    "metrics_enabled": true,
+    "health_check_interval": 30
+  }
+}
