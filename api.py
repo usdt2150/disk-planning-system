@@ -518,6 +518,65 @@ def create_backup():
     except Exception as e:
         return jsonify({'error': f'備份失敗: {str(e)}'}), 500
 
+@app.route('/api/dataease/status', methods=['GET'])
+def get_dataease_status():
+    """檢查 DataEase 連接狀態"""
+    try:
+        # 檢查 DataEase 服務是否可用
+        import requests
+        import socket
+        
+        # 檢查 DataEase 默認端口是否開放
+        dataease_host = os.getenv('DATAEASE_HOST', 'localhost')
+        dataease_port = int(os.getenv('DATAEASE_PORT', '8081'))
+        
+        # 嘗試連接 DataEase 服務
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(5)
+            result = sock.connect_ex((dataease_host, dataease_port))
+            sock.close()
+            
+            if result == 0:
+                # 端口開放，嘗試HTTP請求
+                try:
+                    response = requests.get(
+                        f'http://{dataease_host}:{dataease_port}/api/health',
+                        timeout=5
+                    )
+                    if response.status_code == 200:
+                        status = 'connected'
+                        message = 'DataEase 服務正常運行'
+                    else:
+                        status = 'partial'
+                        message = f'DataEase 服務響應異常 (HTTP {response.status_code})'
+                except requests.exceptions.RequestException:
+                    status = 'partial'
+                    message = 'DataEase 端口開放但HTTP服務不可用'
+            else:
+                status = 'disconnected'
+                message = f'無法連接到 DataEase 服務 ({dataease_host}:{dataease_port})'
+                
+        except Exception as conn_error:
+            status = 'error'
+            message = f'連接檢查失敗: {str(conn_error)}'
+        
+        return jsonify({
+            'status': status,
+            'message': message,
+            'host': dataease_host,
+            'port': dataease_port,
+            'timestamp': datetime.datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f'DataEase 狀態檢查失敗: {str(e)}')
+        return jsonify({
+            'status': 'error',
+            'message': f'狀態檢查失敗: {str(e)}',
+            'timestamp': datetime.datetime.now().isoformat()
+        }), 500
+
 @app.route('/api/dataease/collect-data', methods=['POST'])
 def collect_dataease_data():
     """收集 DataEase 數據"""
